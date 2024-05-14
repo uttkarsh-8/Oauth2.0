@@ -1,4 +1,4 @@
-package com.oath2.oath20.config;
+package com.oath2.oath20.config.userConfig;
 
 import com.oath2.oath20.repository.UserInfoRepository;
 import lombok.RequiredArgsConstructor;
