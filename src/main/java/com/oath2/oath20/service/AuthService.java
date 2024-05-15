@@ -1,5 +1,6 @@
 package com.oath2.oath20.service;
 
+import com.oath2.oath20.config.jwtConfig.JwtTokenGenerator;
 import com.oath2.oath20.dto.AuthResponseDto;
 import com.oath2.oath20.dto.TokenType;
 import com.oath2.oath20.repository.UserInfoRepository;
