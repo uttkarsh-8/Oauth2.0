@@ -21,6 +21,19 @@ public class JwtTokenGenerator {
 
     private final JwtEncoder jwtEncoder;
 
+    public String generateRefreshToken(Authentication authentication){
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuer("uttkarsh")
+                .issuedAt(Instant.now())
+                .expiresAt(Instant.now().plus(15, ChronoUnit.DAYS))
+                .subject(authentication.getName())
+                .claim("scope", "REFRESH_TOKEN")
+                .build();
+
+        return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+    }
+
+
     public String generateAccessToken(Authentication authentication){
         String roles = getRolesOfUser(authentication);
         String permissions = getPermissionsFromRoles(roles);
@@ -28,7 +41,7 @@ public class JwtTokenGenerator {
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("uttkarsh")
                 .issuedAt(Instant.now())
-                .expiresAt(Instant.now().plus(15, ChronoUnit.MINUTES))
+                .expiresAt(Instant.now().plus(1, ChronoUnit.MINUTES))
                 .subject(authentication.getName())
                 .claim("scope", permissions)
                 .build();
