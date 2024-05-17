@@ -55,12 +55,11 @@ public class SecurityConfig {
         return httpSecurity
                 .securityMatcher(new AntPathRequestMatcher("/sign-in/**"))
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
-                .userDetailsService(userInfoManagerConfig)
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+//                .userDetailsService(userInfoManagerConfig)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(ex-> ex.authenticationEntryPoint((_, response, authException) ->
                         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage())))
-                .httpBasic(withDefaults())
                 .build();
     }
 
