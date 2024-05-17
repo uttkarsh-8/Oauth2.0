@@ -3,8 +3,10 @@ package com.oath2.oath20.service;
 import com.oath2.oath20.config.jwtConfig.JwtTokenGenerator;
 import com.oath2.oath20.dto.AuthResponseDto;
 import com.oath2.oath20.dto.TokenType;
+import com.oath2.oath20.dto.UserRegistrationDto;
 import com.oath2.oath20.entity.RefreshTokenEntity;
 import com.oath2.oath20.entity.UserInfoEntity;
+import com.oath2.oath20.mapper.UserInfoMapper;
 import com.oath2.oath20.repository.RefreshTokenRepository;
 import com.oath2.oath20.repository.UserInfoRepository;
 import jakarta.servlet.http.Cookie;
@@ -18,6 +20,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +29,7 @@ public class AuthService {
     private final UserInfoRepository userInfoRepository;
     private final JwtTokenGenerator jwtTokenGenerator;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final UserInfoMapper userInfoMapper;
 
     public AuthResponseDto getJwtTokensAfterAuthentication(Authentication auhthentication, HttpServletResponse response){
         try {
@@ -49,7 +53,7 @@ public class AuthService {
         }
     }
 
-    private Cookie createRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
+    private void createRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
         Cookie refreshTokenCookie = new Cookie("refresh_token", refreshToken);
 
         refreshTokenCookie.setHttpOnly(true);
@@ -58,7 +62,6 @@ public class AuthService {
 
         response.addCookie(refreshTokenCookie);
 
-        return refreshTokenCookie;
     }
 
     private void saveUserRefreshToken(UserInfoEntity userInfoEntity, String refreshToken) {
@@ -111,4 +114,39 @@ public class AuthService {
         return new UsernamePasswordAuthenticationToken(username, password, Arrays.asList(authorities));
     }
 
+    public AuthResponseDto registerUser(UserRegistrationDto userRegistrationDto,HttpServletResponse httpServletResponse) {
+
+        try {
+
+            Optional<UserInfoEntity> user = userInfoRepository.findByEmailId(userRegistrationDto.userEmail());
+            if (user.isPresent()) {
+                throw new Exception("User Already Exist");
+            }
+
+            UserInfoEntity userDetailsEntity = userInfoMapper.convertToEntity(userRegistrationDto);
+            Authentication authentication = createAuthenticationObject(userDetailsEntity);
+
+
+            // Generate a JWT token
+            String accessToken = jwtTokenGenerator.generateAccessToken(authentication);
+            String refreshToken = jwtTokenGenerator.generateRefreshToken(authentication);
+
+            UserInfoEntity savedUserDetails = userInfoRepository.save(userDetailsEntity);
+            saveUserRefreshToken(userDetailsEntity, refreshToken);
+
+            createRefreshTokenCookie(httpServletResponse, refreshToken);
+
+            return AuthResponseDto.builder()
+                    .accessToken(accessToken)
+                    .accessTokenExpiry(5 * 60)
+                    .username(savedUserDetails.getUsername())
+                    .tokenType(TokenType.Bearer)
+                    .build();
+
+
+        } catch (Exception e) {
+
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
 }
