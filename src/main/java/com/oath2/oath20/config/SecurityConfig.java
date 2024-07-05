@@ -9,7 +9,6 @@ import com.nimbusds.jose.proc.SecurityContext;
 import com.oath2.oath20.config.jwtConfig.JwtAccessTokenFilter;
 import com.oath2.oath20.config.jwtConfig.JwtRefreshTokenFilter;
 import com.oath2.oath20.config.jwtConfig.JwtTokenUtils;
-import com.oath2.oath20.config.userConfig.UserInfoManagerConfig;
 import com.oath2.oath20.repository.RefreshTokenRepository;
 import com.oath2.oath20.service.LogoutHandlerService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -43,7 +42,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final UserInfoManagerConfig userInfoManagerConfig;
+//    private final UserInfoManagerConfig userInfoManagerConfig;
     private final RsaKeyRecord rsaKeyRecord;
     private final JwtTokenUtils jwtTokenUtils;
     private final RefreshTokenRepository refreshTokenRepository;

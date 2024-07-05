@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.oath2</groupId>
-	<artifactId>oath2.0</artifactId>
+	<artifactId>LearnLoops</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>oath2.0</name>
 	<description>oath2.0</description>
